@@ -7,6 +7,7 @@ import { useDispatch,useSelector } from "react-redux";
 import { setCredentials } from "../slices/authSlice";
 import {toast} from 'react-toastify'
 import { useUpdateUserMutation } from '../slices/usersApiSlice';
+import { useUpdateUSerProfilePicMutation } from '../slices/usersApiSlice';
 import Loader from '../components/Loader'
 
 
@@ -16,6 +17,8 @@ const ProfileScreen = () => {
     const [email,setEmail] = useState('');
     const [password,setPassword] = useState('');
     const [confirmPassword,setconfirmPassword] = useState('');
+    const [image,setImage]=useState(null)
+    const [pic,setPic] = useState(null)
 
     
     const navigate = useNavigate();
@@ -23,11 +26,13 @@ const ProfileScreen = () => {
 
     const {userInfo} = useSelector((state)=>state.auth);
     const [updateProfile,{isLoading}] = useUpdateUserMutation();
+    const [updateUserProfilePic] = useUpdateUSerProfilePicMutation();
 
     useEffect(()=>{
         setName(userInfo.name);
         setEmail(userInfo.email);
-    },[userInfo.setName,userInfo.setEmail]);
+        setImage(userInfo.image)
+    },[userInfo.name,userInfo.email,userInfo.image]);
 
 
     const submitHandler = async (e)=>{
@@ -48,12 +53,57 @@ const ProfileScreen = () => {
             toast.error(err?.data?.message || err.error);
            }
         }
-    }
+    };
+
+    const handleProfile = async (e)=>{
+        e.preventDefault();
+        
+        if(!pic)toast.error('please select an image')
+        else{
+          const formData = new FormData();
+          formData.append('image', pic);
+          
+          try {
+            const res = await updateUserProfilePic(
+              formData
+             ).unwrap();
+             dispatch(setCredentials({ ...res }));
+             toast.success('Profile picture added successfully');
+            
+          } catch (error) {
+    
+            toast.error(err?.data?.message || err.error);
+            
+          }
+          
+        }
+      }
 
 
   return (
     <FormContainer>
         <h1>Update Profile</h1>
+
+        {pic ?
+      <img alt="profile" width="200px" height="200px" src={pic ? URL.createObjectURL(pic) : ''}></img>
+       :
+       <img alt="profile" width="200px" height="200px" src={`http://localhost:5000/image/${image}`}></img>
+       }
+
+        <Form onSubmit={handleProfile} encType='multipart/form-data'>
+         <Form.Group className='my-2' controlId='name'>
+            <Form.Label>Image</Form.Label>
+                <Form.Control
+                type='file'
+                onChange={(e)=>setPic(e.target.files[0])}
+                >        
+            </Form.Control> 
+            </Form.Group>
+            <Button type='submit' variant='primary' className='mt-3'>
+            Upload
+            </Button>
+        </Form>
+
         <Form onSubmit={submitHandler}>
             <Form.Group className="my-2" controlId="name">
                 <Form.Label>Name</Form.Label>
