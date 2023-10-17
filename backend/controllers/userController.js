@@ -1,6 +1,21 @@
 import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
 import generateToken from "../utils/generateToken.js";
+import multer from "multer";
+
+
+// Configure Multer for file uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "../MERN-AUTH/backend/utils/uploads"); 
+    },
+    filename: (req, file, cb) => {
+      cb(null, file.fieldname + '-' + Date.now() + '.' + file.originalname.split('.').pop());
+    },
+  });
+
+  const upload = multer({storage})
+
 
 const authUser = asyncHandler(async (req,res)=>{
 
@@ -97,10 +112,38 @@ const updateProfile = asyncHandler(async (req,res)=>{
     }
 });
 
+
+const profilePic = (req,res)=>{
+    upload.single('image')(req,res, async(err)=>{
+       
+        if (err) {
+            res.status(400).json(err.message)
+           }
+           try {
+            let user = await User.findOne(req.user._id);
+            user.image = req.file.filename
+            const updatedUser = await user.save();
+           
+            res.json({
+              _id: updatedUser._id,
+              name: updatedUser.name,
+              email: updatedUser.email,
+              image:updatedUser.image
+            });
+
+           } catch (error) {
+            res.status(404);
+            throw new Error('error in image upload');
+  
+           }
+     })
+};
+
 export {
     authUser,
     registerUser,
     logoutUser,
     getUserProfile,
-    updateProfile
+    updateProfile,
+    profilePic
 }
