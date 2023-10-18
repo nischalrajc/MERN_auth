@@ -39,8 +39,14 @@ export const usersApiSlice = apiSlice.injectEndpoints({
                 formData:true
             })
         }),
+        validateUser:builder.mutation({
+            query:(data)=>({
+                url:`${USERS_URL}/validateuser`,
+                method:'GET',
+            })
+        }),
     }),
 });
 
 
-export const {useLoginMutation,useLogoutMutation,useRegisterMutation,useUpdateUserMutation,useUpdateUSerProfilePicMutation,useUserExistMutation} = usersApiSlice;
+export const {useLoginMutation,useLogoutMutation,useRegisterMutation,useUpdateUserMutation,useUpdateUSerProfilePicMutation,useValidateUserMutation} = usersApiSlice;

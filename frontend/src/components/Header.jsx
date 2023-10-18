@@ -2,7 +2,7 @@ import { Navbar, Nav, Container ,NavDropdown, Badge} from 'react-bootstrap';
 import { FaSignInAlt, FaSignOutAlt } from 'react-icons/fa';
 import { LinkContainer } from 'react-router-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { useLogoutMutation } from '../slices/usersApiSlice';
+import { useLogoutMutation,useValidateUserMutation } from '../slices/usersApiSlice';
 import { logout } from '../slices/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
@@ -15,6 +15,26 @@ const Header = () => {
   const navigate = useNavigate();
 
   const [logoutApiCall] = useLogoutMutation();
+  const [validateUser] = useValidateUserMutation();
+
+  useEffect(()=>{
+    validate()
+  },[])
+
+
+  const validate = async()=>{
+    try {
+      if(userInfo){
+       const res = await validateUser().unwrap()
+       console.log(res);
+      }
+    
+    } catch (error) {
+      console.log(error);
+      dispatch(logout());
+      navigate('/');
+    }
+  }
 
   const logoutHandler = async ()=>{
     try {
