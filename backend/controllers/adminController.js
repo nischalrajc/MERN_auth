@@ -1,6 +1,6 @@
 import asyncHandler from "express-async-handler";
 import {generateAdminToken} from "../utils/generateToken.js";
-import { authenticateAdmin,editUSer,getUsers } from "../utils/adminUtils.js";
+import { authenticateAdmin,editUSer,getUsers,createUser } from "../utils/adminUtils.js";
 import User from "../models/userModel.js";
 
 
@@ -46,6 +46,7 @@ const getAllUsers = asyncHandler(async (req,res)=>{
 
 const getUser = asyncHandler(async(req,res)=>{
     let user = await User.findOne({_id:req.query.id})
+    console.log(req.query)
     
     if(user){
         res.status(200).json(user)
@@ -56,7 +57,6 @@ const getUser = asyncHandler(async(req,res)=>{
 
 
 const editUsersAdmin = asyncHandler(async(req,res)=>{
-
     const updatedUser = await editUSer(req.body);
     if(updatedUser){
         res.json({
@@ -69,7 +69,41 @@ const editUsersAdmin = asyncHandler(async(req,res)=>{
         res.status(404);
         throw new Error('email already exists');
       }
+});
+
+
+const deleteUsers = asyncHandler(async(req,res)=>{
+
+    await User.deleteOne({ _id: req.query.id });
+    res.status(200).json({message:"user deleted successfully",id:req.query.id})
+
+});
+
+
+const createUserAdmin = asyncHandler(async(req,res)=>{
+
+    const user = await createUser(req.body)
+
+    if(!user){
+        res.status(400)
+        throw new Error('User already exists')
+    }
+
+    if(user){
+        res.status(201).json(
+            {
+               _id:user._id,
+               name:user.name,
+               email:user.email,
+            }
+        )
+    }else{
+        res.status(400)
+        throw new Error("invalid user data")
+    }
 })
+
+
 
 
 
@@ -78,5 +112,7 @@ export {
     logoutAdmin,
     getAllUsers,
     getUser,
-    editUsersAdmin
+    editUsersAdmin,
+    deleteUsers,
+    createUserAdmin
 }

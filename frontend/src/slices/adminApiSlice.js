@@ -16,7 +16,35 @@ export const adminApiSlice = apiSlice.injectEndpoints({
                 method:'GET',
             })
         }),
+        editUser:builder.mutation({
+            query:(id)=>({
+              url:`${ADMIN_URL}/edit`,
+              method:'GET',
+              params:{id:id}
+            })
+        }),
+        updateUserAdmin:builder.mutation({
+            query:(data)=>({
+              url:`${ADMIN_URL}/edit`,
+              method:'PUT',
+              body:data,
+            })
+        }),
+        deleteUser:builder.mutation({
+            query:(id)=>({
+              url:`${ADMIN_URL}/users`,
+              method:'DELETE',
+              params:{id:id}
+            })
+        }),
+        createUser:builder.mutation({
+            query:(data)=>({
+              url:`${ADMIN_URL}/users`,
+              method:'POST',
+              body:data
+            })
+        }),
     }),
 });
 
-export const {useAdminLoginMutation,useGetUserMutation} = adminApiSlice
+export const {useAdminLoginMutation,useGetUserMutation,useEditUserMutation,useUpdateUserAdminMutation,useDeleteUserMutation,useCreateUserMutation} = adminApiSlice

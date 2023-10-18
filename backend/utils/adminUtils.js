@@ -1,7 +1,6 @@
 import Admin from "../models/adminModel.js";
 import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
-// import User from "../models/userModel";
 
 const authenticateAdmin = asyncHandler(async(data)=>{
     const {email,password} = data;
@@ -37,10 +36,30 @@ const editUSer = asyncHandler(async(data)=>{
         return updatedUser;
     }
     return false;
+});
+
+
+const createUser = asyncHandler(async(data)=>{
+    const {name,email,password} = data;
+    const userExist = await User.findOne({email});
+
+    if(userExist){
+        return false;
+    }else{
+        const user = await User.create(
+            {
+                name,
+                email,
+                password
+            }
+        )
+        return user;
+    }
 })
 
 export {
     authenticateAdmin,
     editUSer,
-    getUsers
+    getUsers,
+    createUser
 }
