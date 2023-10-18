@@ -1,6 +1,6 @@
 import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
-import generateToken from "../utils/generateToken.js";
+import {generateToken} from "../utils/generateToken.js";
 import multer from "multer";
 
 
@@ -139,11 +139,30 @@ const profilePic = (req,res)=>{
      })
 };
 
+
+const uservalidation = asyncHandler(async(req,res)=>{
+
+    if(!req.user){
+        res.cookie('jwt','',{
+            httpOnly:true,
+            expires:new Date(0),
+        });
+
+        res.status(404);
+        throw new Error('User not found')
+    }
+
+    res.status(200).json({
+        status:"true"
+       });
+})
+
 export {
     authUser,
     registerUser,
     logoutUser,
     getUserProfile,
     updateProfile,
-    profilePic
+    profilePic,
+    uservalidation
 }
